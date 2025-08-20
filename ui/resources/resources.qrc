@@ -1,0 +1,6 @@
+<RCC>
+    <qresource>
+        <file alias="noise1_air_conditioning.wav" compress="5" compress-algo="best">audio_files/noise1_air_conditioning.wav</file>
+        <file alias="noise2_bus.wav" compress="5" compress-algo="best">audio_files/noise2_bus.wav</file>
+    </qresource>
+</RCC>
