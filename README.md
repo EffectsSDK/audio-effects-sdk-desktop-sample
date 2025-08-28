@@ -12,8 +12,14 @@ Download a release of [Audio Effects SDK](https://github.com/EffectsSDK/audio-ef
 ### Windows
 
 * Visual Studio 2022
-* CMake 3.29
+* CMake 3.29 or newer
 * Qt 6.8
+
+### macOS
+
+* Xcode 13 or newer
+* CMake 3.29 or newer
+* Qt 6.5
 
 ## How To Build
 
@@ -38,3 +44,21 @@ cmake --install build --config Release
 _Don't use `--prefix`, use `-DCMAKE_INSTALL_PREFIX` in the configure step instead_
 
 The built application must be inside `%CD%/output_app`. Run `AudioEffectsSDKDemo.exe` file.
+
+### macOS
+
+1. Configure the project
+```sh
+cmake -G Xcode -S . -B build ^
+ -DAUDIO_EFFECTS_SDK_DIR=%CD%/audio-effects-sdk ^ 
+ -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"
+```
+
+2. Build the project
+```bat
+cmake --build build --config Release
+```
+
+3. Run the app
+
+The app bundle must be placed at `build/Release/AudioEffectsSDKDemo.app`.

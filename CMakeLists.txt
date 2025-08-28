@@ -23,11 +23,18 @@ if(AUDIO_EFFECTS_SDK_DIR)
     add_library(${sdk_lib_target} SHARED IMPORTED)
     add_library(effects_sdk::AudioEffectsSDK ALIAS ${sdk_lib_target})
     file(TO_CMAKE_PATH ${AUDIO_EFFECTS_SDK_DIR} AUDIO_EFFECTS_SDK_DIR)
-    set_target_properties(
-        ${sdk_lib_target} PROPERTIES
-        IMPORTED_LOCATION ${AUDIO_EFFECTS_SDK_DIR}/bin/AudioEffectsSDK.dll
-        IMPORTED_IMPLIB ${AUDIO_EFFECTS_SDK_DIR}/lib/AudioEffectsSDK.lib
-    )
+    if(WIN32)
+        set_target_properties(
+            ${sdk_lib_target} PROPERTIES
+            IMPORTED_LOCATION ${AUDIO_EFFECTS_SDK_DIR}/bin/AudioEffectsSDK.dll
+            IMPORTED_IMPLIB ${AUDIO_EFFECTS_SDK_DIR}/lib/AudioEffectsSDK.lib
+        )
+    elseif(APPLE)
+        set_target_properties(
+            ${sdk_lib_target} PROPERTIES
+            IMPORTED_LOCATION ${AUDIO_EFFECTS_SDK_DIR}/lib/libAudioEffectsSDK.dylib
+        )
+    endif()
     target_include_directories(${sdk_lib_target} INTERFACE ${AUDIO_EFFECTS_SDK_DIR}/include)
 endif()
 
@@ -43,7 +50,7 @@ set(HEADER_FILES
     core/mic_enumerator.h
     core/sdk_factory.h
     core/sdk_helpers.h
-    "core/sdk_notification_handler.h"
+    core/sdk_notification_handler.h
 )
 
 set(SOURCE_FILES
@@ -58,7 +65,7 @@ set(SOURCE_FILES
     core/mic_audio_source.cpp
     core/sdk_factory.cpp
     core/sdk_helpers.cpp
-    "core/sdk_notification_handler.cpp"
+    core/sdk_notification_handler.cpp
 )
 
 qt6_add_resources(
@@ -131,4 +138,29 @@ if(WIN32)
     include(InstallRequiredSystemLibraries)
 
     install(PROGRAMS "$<TARGET_FILE:effects_sdk::AudioEffectsSDK>" DESTINATION .)
+endif()
+
+if (APPLE)
+    set_target_properties(
+        ${TARGET_APP} PROPERTIES
+        MACOSX_BUNDLE_GUI_IDENTIFIER com.damiko.audio-effects-sdk.demo.desktop
+        MACOSX_BUNDLE_BUNDLE_NAME "Audio Effects SDK Demo"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${PRODUCT_VERSION}"
+    )
+
+    add_custom_command(
+        TARGET ${TARGET_APP} POST_BUILD
+        COMMAND plutil -replace NSMicrophoneUsageDescription -string "Demo mic"
+            "$<TARGET_BUNDLE_DIR:${TARGET_APP}>/Contents/Info.plist"
+        COMMENT "Patching Info.plist"
+        VERBOSE
+    )
+
+    find_program(macdeployqt_bin macdeployqt HINTS "${qt_bin_dir}")
+    add_custom_target(
+        deploy
+        COMMAND "${macdeployqt_bin}" "$<TARGET_BUNDLE_DIR:${TARGET_APP}>"
+        DEPENDS ${TARGET_APP}
+        VERBATIM
+    )
 endif()

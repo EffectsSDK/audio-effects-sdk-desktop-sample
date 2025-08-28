@@ -18,6 +18,7 @@ class FileAudioSource : public AbstractAudioSource
     Q_DISABLE_COPY_MOVE(FileAudioSource)
 public:
     FileAudioSource(QObject * parent = nullptr);
+    ~FileAudioSource();
 
     void setSourceFilePath(const QString& path);
     void setFormat(const QAudioFormat& format);

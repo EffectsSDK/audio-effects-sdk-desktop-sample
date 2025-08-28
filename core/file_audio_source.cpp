@@ -1,6 +1,5 @@
 #include "file_audio_source.h"
 #include "audio_buffer_qiodevice.h"
-//#include <QAudioDeviceInfo>
 #include <qdebug.h>
 
 namespace core {
@@ -10,6 +9,8 @@ FileAudioSource::FileAudioSource(QObject * parent)
     , _currentTimestampMs(0.0)
     , _durationMs(0.0)
 { }
+
+FileAudioSource::~FileAudioSource() = default;
 
 void FileAudioSource::setSourceFilePath(const QString& path)
 {
